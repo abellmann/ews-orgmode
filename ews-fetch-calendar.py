@@ -70,9 +70,9 @@ def print_orgmode_entry(subject, start, end, location, response):
 
   if subject is not None:
     if dateStr != "":
-      print "* " + dateStr + " " + subject.encode('ascii', 'ignore')
+      print "* " + dateStr + " " + subject.encode('utf-8', 'ignore')
     else:
-      print "* " + subject.encode('ascii', 'ignore')
+      print "* " + subject.encode('utf-8', 'ignore')
 
   if location is not None:
     print ":PROPERTIES:"
