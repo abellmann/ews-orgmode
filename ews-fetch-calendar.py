@@ -94,6 +94,14 @@ def stdout_redirected(new_stdout):
     finally:
         sys.stdout = save_stdout
 
+def printElements(elements):
+    for element in elements:
+      subject= findSubelement(element,'{http://schemas.microsoft.com/exchange/services/2006/types}Subject')
+      location= findSubelement(element,'{http://schemas.microsoft.com/exchange/services/2006/types}Location')
+      start = findSubelement(element,'{http://schemas.microsoft.com/exchange/services/2006/types}Start')
+      end = findSubelement(element,'{http://schemas.microsoft.com/exchange/services/2006/types}End')
+      response = findSubelement(element,'{http://schemas.microsoft.com/exchange/services/2006/types}MyResponseType')
+      print_orgmode_entry(subject, start, end, location, response)
 
 
 ofile=''
@@ -109,10 +117,10 @@ myopts, args = getopt.getopt(sys.argv[1:],"o:")
 for o, a in myopts:
     if o == '-o':
         ofile=a
+    else:
+        print("Usage: %s -o output" % sys.argv[0])
+        sys.exit(1)
 
-if ofile == '':
-    print("Usage: %s -o output" % sys.argv[0])
-    sys.exit(1)
 
 #Debug code
 #print_orgmode_entry("subject", "2012-07-27T11:10:53Z", "2012-07-27T11:15:53Z", "location", "participants")
@@ -174,14 +182,11 @@ namespaces = {
 
 # Print calendar elements
 elements = root.xpath(xpathStr, namespaces=namespaces)
-with open(ofile,"w") as f:
-    with stdout_redirected(f):
-        for element in elements:
-          subject= findSubelement(element,'{http://schemas.microsoft.com/exchange/services/2006/types}Subject')
-          location= findSubelement(element,'{http://schemas.microsoft.com/exchange/services/2006/types}Location')
-          start = findSubelement(element,'{http://schemas.microsoft.com/exchange/services/2006/types}Start')
-          end = findSubelement(element,'{http://schemas.microsoft.com/exchange/services/2006/types}End')
-          response = findSubelement(element,'{http://schemas.microsoft.com/exchange/services/2006/types}MyResponseType')
-          print_orgmode_entry(subject, start, end, location, response)
+if ofile != '':
+    with open(ofile,"w") as f:
+        with stdout_redirected(f):
+            printElements(elements)
 
-
+else:
+    for element in elements:
+        printElements(elements)
