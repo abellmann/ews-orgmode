@@ -23,7 +23,7 @@ def findSubelement(element, subelementLocation):
   :param attributelocation: location in xml
   :return: the attribute value or "undefined" if attribute does not exist
   """
-  location = element.find(attributelocation)
+  location = element.find(subelementLocation)
   if (location is not None):
     return location.text
   else:
