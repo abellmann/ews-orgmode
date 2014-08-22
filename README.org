@@ -22,7 +22,7 @@ If everythings ok, you should see your exchange calendar in orgmode format as co
 can redirect it into an orgmode file for using in your agenda. E.g. you could  use something like this
 in a cronjob:
 
-: ./ews-fetch-calendar.py > ~/org/exchange.org
+: ./ews-fetch-calendar.py -o ~/org/exchange.org
 
 * Disclaimer
 Use the script at your own risk. Read it, understand it, modify it. But do not
