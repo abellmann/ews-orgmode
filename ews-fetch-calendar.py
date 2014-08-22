@@ -188,5 +188,4 @@ if ofile != '':
             printElements(elements)
 
 else:
-    for element in elements:
         printElements(elements)
