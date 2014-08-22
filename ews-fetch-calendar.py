@@ -14,6 +14,9 @@ import pytz
 import httplib
 import base64
 import ConfigParser
+import sys
+import getopt
+from contextlib import contextmanager
 
 def findSubelement(element, subelementLocation):
   """ returns an attribute for an xml element
@@ -82,6 +85,35 @@ def print_orgmode_entry(subject, start, end, location, response):
 
   print ""
 
+@contextmanager
+def stdout_redirected(new_stdout):
+    save_stdout = sys.stdout
+    sys.stdout = new_stdout
+    try:
+        yield None
+    finally:
+        sys.stdout = save_stdout
+
+
+
+ofile=''
+# get command line arguments
+# Read command line args
+myopts, args = getopt.getopt(sys.argv[1:],"o:")
+
+
+###############################
+# o == option
+# a == argument passed to the o
+###############################
+for o, a in myopts:
+    if o == '-o':
+        ofile=a
+
+if ofile == '':
+    print("Usage: %s -o output" % sys.argv[0])
+    sys.exit(1)
+
 #Debug code
 #print_orgmode_entry("subject", "2012-07-27T11:10:53Z", "2012-07-27T11:15:53Z", "location", "participants")
 #exit(0)
@@ -142,12 +174,14 @@ namespaces = {
 
 # Print calendar elements
 elements = root.xpath(xpathStr, namespaces=namespaces)
-for element in elements:
-  subject= findSubelement(element,'{http://schemas.microsoft.com/exchange/services/2006/types}Subject')
-  location= findSubelement(element,'{http://schemas.microsoft.com/exchange/services/2006/types}Location')
-  start = findSubelement(element,'{http://schemas.microsoft.com/exchange/services/2006/types}Start')
-  end = findSubelement(element,'{http://schemas.microsoft.com/exchange/services/2006/types}End')
-  response = findSubelement(element,'{http://schemas.microsoft.com/exchange/services/2006/types}MyResponseType')
-  print_orgmode_entry(subject, start, end, location, response)
+with open(ofile,"w") as f:
+    with stdout_redirected(f):
+        for element in elements:
+          subject= findSubelement(element,'{http://schemas.microsoft.com/exchange/services/2006/types}Subject')
+          location= findSubelement(element,'{http://schemas.microsoft.com/exchange/services/2006/types}Location')
+          start = findSubelement(element,'{http://schemas.microsoft.com/exchange/services/2006/types}Start')
+          end = findSubelement(element,'{http://schemas.microsoft.com/exchange/services/2006/types}End')
+          response = findSubelement(element,'{http://schemas.microsoft.com/exchange/services/2006/types}MyResponseType')
+          print_orgmode_entry(subject, start, end, location, response)
 
 
