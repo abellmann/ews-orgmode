@@ -15,6 +15,21 @@ import httplib
 import base64
 import ConfigParser
 
+def findSubelement(element, subelementLocation):
+  """ returns an attribute for an xml element
+
+  :rtype : String
+  :param element: xml element
+  :param attributelocation: location in xml
+  :return: the attribute value or "undefined" if attribute does not exist
+  """
+  location = element.find(attributelocation)
+  if (location is not None):
+    return location.text
+  else:
+      return "undefined"
+
+
 # Read the config file
 config = ConfigParser.RawConfigParser()
 dir = os.path.realpath(__file__)[:-21]
@@ -128,9 +143,11 @@ namespaces = {
 # Print calendar elements
 elements = root.xpath(xpathStr, namespaces=namespaces)
 for element in elements:
-  subject= element.find('{http://schemas.microsoft.com/exchange/services/2006/types}Subject').text
-  location= element.find('{http://schemas.microsoft.com/exchange/services/2006/types}Location').text
-  start = element.find('{http://schemas.microsoft.com/exchange/services/2006/types}Start').text
-  end = element.find('{http://schemas.microsoft.com/exchange/services/2006/types}End').text
-  response = element.find('{http://schemas.microsoft.com/exchange/services/2006/types}MyResponseType').text
+  subject= findSubelement(element,'{http://schemas.microsoft.com/exchange/services/2006/types}Subject')
+  location= findSubelement(element,'{http://schemas.microsoft.com/exchange/services/2006/types}Location')
+  start = findSubelement(element,'{http://schemas.microsoft.com/exchange/services/2006/types}Start')
+  end = findSubelement(element,'{http://schemas.microsoft.com/exchange/services/2006/types}End')
+  response = findSubelement(element,'{http://schemas.microsoft.com/exchange/services/2006/types}MyResponseType')
   print_orgmode_entry(subject, start, end, location, response)
+
+
