@@ -73,9 +73,9 @@ def print_orgmode_entry(subject, start, end, location, response):
 
   if subject is not None:
     if dateStr != "":
-      print "* " + dateStr + " " + subject.encode('utf-8', 'ignore')
+      print "* TODO " + dateStr + " " + subject.encode('utf-8', 'ignore') + " :outlook:"
     else:
-      print "* " + subject.encode('utf-8', 'ignore')
+      print "* TODO " + subject.encode('utf-8', 'ignore') + " :outlook:"
 
   if location is not None:
     print ":PROPERTIES:"
@@ -167,8 +167,8 @@ data = resp.read()
 conn.close()
 
 # Debug code
-# print data
-# exit(0)
+#print data
+#exit(0)
 
 # Parse the result xml
 root = etree.fromstring(data)
