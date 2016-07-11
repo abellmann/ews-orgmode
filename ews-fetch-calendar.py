@@ -10,8 +10,9 @@ from datetime import datetime
 from datetime import date
 from datetime import timedelta
 from pytz import timezone
+from StringIO import StringIO
 import pytz
-import httplib
+import pycurl
 import base64
 import ConfigParser
 import sys
@@ -34,15 +35,27 @@ def findSubelement(element, subelementLocation):
 
 
 # Read the config file
-config = ConfigParser.RawConfigParser()
-dir = os.path.realpath(__file__)[:-21]
-config.read(dir + 'config.cfg')
+timezoneLocation = os.getenv('TZ', 'UTC')
+config = ConfigParser.RawConfigParser({
+  'path': '/ews/Exchange.asmx',
+  'username': '',
+  'password': '',
+  'auth_type': 'any',
+  'cainfo': '',
+  'timezone': timezoneLocation,
+  'days_history': 7,
+  'days_future': 30,
+  'max_entries': 100})
+dir = os.path.dirname(os.path.realpath(__file__))
+config.read(os.path.join(dir, 'config.cfg'))
 
 # Exchange user and password
 ewsHost = config.get('ews-orgmode', 'host')
 ewsUrl = config.get('ews-orgmode', 'path')
 ewsUser = config.get('ews-orgmode', 'username')
 ewsPassword = config.get('ews-orgmode', 'password')
+ewsAuthType = config.get('ews-orgmode', 'auth_type').lower()
+ewsCAInfo = config.get('ews-orgmode', 'cainfo')
 timezoneLocation = config.get('ews-orgmode', 'timezone')
 daysHistory = config.getint('ews-orgmode', 'days_history')
 daysFuture = config.getint('ews-orgmode', 'days_future')
@@ -126,6 +139,7 @@ for o, a in myopts:
 #print_orgmode_entry("subject", "2012-07-27T11:10:53Z", "2012-07-27T11:15:53Z", "location", "participants")
 #exit(0)
 
+
 # Build the soap request
 # For CalendarItem documentation, http://msdn.microsoft.com/en-us/library/exchange/aa564765(v=exchg.140).aspx
 start = date.today() - timedelta(days=daysHistory)
@@ -150,21 +164,52 @@ request = """<?xml version="1.0" encoding="utf-8"?>
     </FindItem>
   </soap:Body>
 </soap:Envelope>""".format(start, end, maxEntries)
+request_len = len(request)
+request = StringIO(request)
+# Debug code
+# print request.getvalue()
+# exit(0)
 
-# Build authentication string, remove newline for using it in a http header
-auth = base64.encodestring("%s:%s" % (ewsUser, ewsPassword)).replace('\n', '')
-conn = httplib.HTTPSConnection(ewsHost)
-conn.request("POST", ewsUrl, body = request, headers = {
-  "Host": ewsHost,
-  "Content-Type": "text/xml; charset=UTF-8",
-  "Content-Length": len(request),
-  "Authorization" : "Basic %s" % auth
-})
+h = []
+h.append('Content-Type: text/xml; charset=UTF-8')
+h.append('Content-Length: %d' % request_len);
+
+header = StringIO()
+body = StringIO()
+
+c = pycurl.Curl()
+# Debug code
+# c.setopt(c.VERBOSE, 1)
+
+c.setopt(c.URL, 'https://%s%s' % (ewsHost, ewsUrl))
+c.setopt(c.POST, 1)
+c.setopt(c.HTTPHEADER, h)
+
+if ewsAuthType == 'digest':
+  c.setopt(c.HTTPAUTH, c.HTTPAUTH_DIGEST)
+elif ewsAuthType == 'basic':
+  c.setopt(c.HTTPAUTH, c.HTTPAUTH_BASIC)
+elif ewsAuthType == 'ntlm':
+  c.setopt(c.HTTPAUTH, c.HTTPAUTH_NTLM)
+elif ewsAuthType == 'negotiate':
+  c.setopt(c.HTTPAUTH, c.HTTPAUTH_GSSNEGOTIATE)
+elif ewsAuthType == 'any':
+  c.setopt(c.HTTPAUTH, c.HTTPAUTH_ANYSAFE)
+c.setopt(c.USERPWD, '%s:%s' % (ewsUser, ewsPassword))
+
+if len(ewsCAInfo) > 0:
+  c.setopt(c.CAINFO, ewsCAInfo)
+
+# http://stackoverflow.com/questions/27808835/fail-to-assign-io-object-to-writedata-pycurl
+c.setopt(c.WRITEFUNCTION, body.write)
+c.setopt(c.HEADERFUNCTION, header.write)
+c.setopt(c.READFUNCTION, request.read)
+
+c.perform()
+c.close()
 
 # Read the webservice response
-resp = conn.getresponse()
-data = resp.read()
-conn.close()
+data = body.getvalue()
 
 # Debug code
 # print data
@@ -182,10 +227,35 @@ namespaces = {
 
 # Print calendar elements
 elements = root.xpath(xpathStr, namespaces=namespaces)
-if ofile != '':
-    with open(ofile,"w") as f:
-        with stdout_redirected(f):
-            printElements(elements)
+for element in elements:
+  subjectElem = element.find('{http://schemas.microsoft.com/exchange/services/2006/types}Subject')
+  if subjectElem is not None:
+    subject = subjectElem.text
+  else:
+    subject = ""
 
-else:
-        printElements(elements)
+  locationElem = element.find('{http://schemas.microsoft.com/exchange/services/2006/types}Location')
+  if locationElem is not None:
+    location = locationElem.text
+  else:
+    location = ""
+
+  startElem = element.find('{http://schemas.microsoft.com/exchange/services/2006/types}Start')
+  if startElem is not None:
+    start = startElem.text
+  else:
+    start = ""
+
+  endElem = element.find('{http://schemas.microsoft.com/exchange/services/2006/types}End')
+  if endElem is not None:
+    end = endElem.text
+  else:
+    end = ""
+
+  responseElem = element.find('{http://schemas.microsoft.com/exchange/services/2006/types}MyResponseType')
+  if responseElem is not None:
+    response = responseElem.text
+  else:
+    response = ""
+
+  print_orgmode_entry(subject, start, end, location, response)
