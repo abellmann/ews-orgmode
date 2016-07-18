@@ -11,8 +11,9 @@ from datetime import datetime
 from datetime import date
 from datetime import timedelta
 from pytz import timezone
+from StringIO import StringIO
 import pytz
-import httplib
+import pycurl
 import base64
 import ConfigParser
 import sys
@@ -140,6 +141,7 @@ for o, a in myopts:
 #Debug code
 #print_orgmode_entry("subject", "2012-07-27T11:10:53Z", "2012-07-27T11:15:53Z", "location", "participants")
 #exit(0)
+
 
 # Build the soap request
 # For CalendarItem documentation, http://msdn.microsoft.com/en-us/library/exchange/aa564765(v=exchg.140).aspx
