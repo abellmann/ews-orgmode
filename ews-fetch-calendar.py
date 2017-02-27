@@ -1,4 +1,3 @@
-#!python2
 #!/usr/bin/python
 
 # This script was inspired by:
@@ -46,8 +45,7 @@ config = ConfigParser.RawConfigParser({
   'timezone': timezoneLocation,
   'days_history': 7,
   'days_future': 30,
-  'max_entries': 100,
-  'verify_certificates': True})
+  'max_entries': 100})
 dir = os.path.dirname(os.path.realpath(__file__))
 config.read(os.path.join(dir, 'config.cfg'))
 
@@ -62,7 +60,6 @@ timezoneLocation = config.get('ews-orgmode', 'timezone')
 daysHistory = config.getint('ews-orgmode', 'days_history')
 daysFuture = config.getint('ews-orgmode', 'days_future')
 maxEntries = config.getint('ews-orgmode', 'max_entries')
-verifyCertificates = config.getboolean('ews-orgmode', 'verify_certificates')
 
 def parse_ews_date(dateStr):
   d = datetime.strptime(dateStr, "%Y-%m-%dT%H:%M:%SZ")
@@ -200,9 +197,6 @@ elif ewsAuthType == 'any':
   c.setopt(c.HTTPAUTH, c.HTTPAUTH_ANYSAFE)
 c.setopt(c.USERPWD, '%s:%s' % (ewsUser, ewsPassword))
 
-# disable certificate verification for self signed certificate
-if not verifyCertificates:
-  c.setopt(c.SSL_VERIFYPEER, 0)
 if len(ewsCAInfo) > 0:
   c.setopt(c.CAINFO, ewsCAInfo)
 
