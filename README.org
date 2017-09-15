@@ -42,6 +42,21 @@ in a cronjob:
 
 : ./ews-fetch-calendar.py -o ~/org/exchange.org
 
+** Run with Docker
+
+- create the docker image
+#+BEGIN_SRC sh
+# cd /cloned/directory
+docker build --tag ews-orgmode .
+#+END_SRC
+
+- run the docker image
+#+BEGIN_SRC sh
+docker run ews-orgmode
+#+END_SRC
+
+
+
 * Disclaimer
 Use the script at your own risk. Read it, understand it, modify it. But do not
 blame me if something goes wrong.
