@@ -9,3 +9,16 @@ days_history=7
 days_future=30
 max_entries=100
 cainfo=/path/to/root_ca.crt
+
+# office 365
+#host=outlook.office365.com
+#path=/EWS/Exchange.asmx
+#username=andreas.bellmann@mydomain.com
+#password=password
+#auth_type=basic
+#timezone=Europe/Vienna
+#days_history=7
+#days_future=30
+#max_entries=100
+##cainfo=/path/to/root_ca.crt
+
