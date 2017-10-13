@@ -13,7 +13,7 @@ cainfo=/path/to/root_ca.crt
 # office 365
 #host=outlook.office365.com
 #path=/EWS/Exchange.asmx
-#username=andreas.bellmann@mydomain.com
+#username=your.name@yourdomain.com
 #password=password
 #auth_type=basic
 #timezone=Europe/Vienna
