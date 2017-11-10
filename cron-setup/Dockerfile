@@ -1,16 +1,10 @@
 FROM ews-orgmode
 
-RUN apt-get update && \
-    apt-get -y install cron
+RUN curl -o /usr/local/bin/mantra \
+    -L https://github.com/pugnascotia/mantra/releases/download/0.0.1/mantra && \
+    chmod +x /usr/local/bin/mantra
 
-# Add crontab file in the cron directory
-ADD crontab /etc/cron.d/ews-orgmode
+VOLUME /data
 
-# Give execution rights on the cron job
-# Create the log file to be able to run tail
-# start cron on container startup
-RUN chmod 0644 /etc/cron.d/ews-orgmode && \
-    touch /var/log/cron.log && \
-    cron && \
-    tail -f /var/log/cron.log
-
+COPY run-cron.sh /root
+CMD mantra "0 0 * * * *" /root/run-cron.sh

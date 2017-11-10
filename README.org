@@ -55,7 +55,33 @@ docker build --tag ews-orgmode .
 docker run ews-orgmode
 #+END_SRC
 
+** Run as scheduled job
 
+The scheduler uses mantra to run scheduled jobs. Mantra is a simple job
+scheduler without much overhead. See https://github.com/pugnascotia/mantra
+
+
+The scheduled job will run hourly (as configured in cron-setup/Dockerfile). The
+format is based on a cron-like setup, but also allows runs every second. The
+format is described [[https://godoc.org/github.com/robfig/cron][here]]
+
+The docker-compose.yml writes the output to the .ews-orgmode directory parallel to the root of
+this project and restarts the container automatically, if docker restarts.
+
+#+BEGIN_SRC sh
+# cd /cloned/directory
+# build the ews-orgmode image
+docker build --tag ews-orgmode .
+# create output directory
+mkdir /../.ews-orgmode
+# initial creation of docker-compose services (run only once)
+cd cron-setup
+docker-compose up
+# cancel with ctrl-c
+# start as background service
+docker-compose start
+
+#+END_SRC
 
 * Disclaimer
 Use the script at your own risk. Read it, understand it, modify it. But do not

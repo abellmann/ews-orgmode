@@ -1,0 +1,9 @@
+version: '3'
+services:
+  ews-orgmode:
+    build:
+      context: .
+    image: ews-orgmode-cron
+    volumes:
+      - ../../.ews-orgmode:/data
+    restart: always
