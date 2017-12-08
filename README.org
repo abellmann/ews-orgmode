@@ -73,7 +73,7 @@ this project and restarts the container automatically, if docker restarts.
 # build the ews-orgmode image
 docker build --tag ews-orgmode .
 # create output directory
-mkdir /../.ews-orgmode
+mkdir ../.ews-orgmode
 # initial creation of docker-compose services (run only once)
 cd cron-setup
 docker-compose up
