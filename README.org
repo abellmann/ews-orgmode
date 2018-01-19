@@ -44,7 +44,14 @@ in a cronjob:
 
 ** Run with Docker
 
-- create the docker image
+- Use the docker image on github
+
+#+BEGIN_SRC sh
+docker run abellmann/ews-orgmode
+
+#+END_SRC
+
+- create the docker image locally
 #+BEGIN_SRC sh
 # cd /cloned/directory
 docker build --tag ews-orgmode .
@@ -71,15 +78,11 @@ this project and restarts the container automatically, if docker restarts.
 #+BEGIN_SRC sh
 # cd /cloned/directory
 # build the ews-orgmode image
-docker build --tag ews-orgmode .
 # create output directory
 mkdir ../.ews-orgmode
 # initial creation of docker-compose services (run only once)
 cd cron-setup
-docker-compose up
-# cancel with ctrl-c
-# start as background service
-docker-compose start
+docker-compose up -d
 
 #+END_SRC
 
