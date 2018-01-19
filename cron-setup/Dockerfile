@@ -1,4 +1,4 @@
-FROM abellmann/ews-orgmode
+FROM ews-orgmode
 
 RUN curl -o /usr/local/bin/mantra \
     -L https://github.com/pugnascotia/mantra/releases/download/0.0.1/mantra && \
