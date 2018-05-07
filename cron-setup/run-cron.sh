@@ -1,2 +1,2 @@
 #!/bin/bash
-python /root/ews-fetch-calendar.py > /data/outlook.org 
+python /root/ews-fetch-calendar.py -o /data/outlook.org 

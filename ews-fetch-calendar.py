@@ -25,13 +25,13 @@ def findSubelement(element, subelementLocation):
   :rtype : String
   :param element: xml element
   :param attributelocation: location in xml
-  :return: the attribute value or "undefined" if attribute does not exist
+  :return: the attribute value or "" if attribute does not exist
   """
   location = element.find(subelementLocation)
   if (location is not None):
     return location.text
   else:
-      return "undefined"
+      return ""
 
 
 # Read the config file
@@ -227,35 +227,9 @@ namespaces = {
 
 # Print calendar elements
 elements = root.xpath(xpathStr, namespaces=namespaces)
-for element in elements:
-  subjectElem = element.find('{http://schemas.microsoft.com/exchange/services/2006/types}Subject')
-  if subjectElem is not None:
-    subject = subjectElem.text
-  else:
-    subject = ""
-
-  locationElem = element.find('{http://schemas.microsoft.com/exchange/services/2006/types}Location')
-  if locationElem is not None:
-    location = locationElem.text
-  else:
-    location = ""
-
-  startElem = element.find('{http://schemas.microsoft.com/exchange/services/2006/types}Start')
-  if startElem is not None:
-    start = startElem.text
-  else:
-    start = ""
-
-  endElem = element.find('{http://schemas.microsoft.com/exchange/services/2006/types}End')
-  if endElem is not None:
-    end = endElem.text
-  else:
-    end = ""
-
-  responseElem = element.find('{http://schemas.microsoft.com/exchange/services/2006/types}MyResponseType')
-  if responseElem is not None:
-    response = responseElem.text
-  else:
-    response = ""
-
-  print_orgmode_entry(subject, start, end, location, response)
+if ofile != '':
+  with open(ofile,"w") as f:
+    with stdout_redirected(f):
+      printElements(elements)
+else:
+  printElements(elements)
