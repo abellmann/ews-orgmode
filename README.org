@@ -76,6 +76,7 @@ docker build --tag ews-orgmode .
 mkdir /../.ews-orgmode
 # initial creation of docker-compose services (run only once)
 cd cron-setup
+docker-compose build
 docker-compose up
 # cancel with ctrl-c
 # start as background service
