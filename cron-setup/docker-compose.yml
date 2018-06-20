@@ -3,7 +3,13 @@ services:
   ews-orgmode:
     build:
       context: .
+      args:
+        - http_proxy
+        - https_proxy
     image: ews-orgmode-cron
     volumes:
       - ../../.ews-orgmode:/data
     restart: always
+    environment:
+      - http_proxy
+      - https_proxy
